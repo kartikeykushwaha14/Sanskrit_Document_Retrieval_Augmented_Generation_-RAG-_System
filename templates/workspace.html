@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace — Sanskrit RAG</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0d0f14;
+            --surface: #13161f;
+            --surface2: #1a1e2b;
+            --surface3: #222738;
+            --border: #2a2f42;
+            --border2: #343b54;
+            --accent: #7c6aff;
+            --accent2: #a78bfa;
+            --accent3: #c4b5fd;
+            --gold: #f59e0b;
+            --gold2: #fbbf24;
+            --emerald: #10b981;
+            --emerald2: #34d399;
+            --rose: #f43f5e;
+            --sky: #38bdf8;
+            --text: #e2e8f0;
+            --text2: #94a3b8;
+            --text3: #64748b;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --shadow: 0 4px 24px rgba(0,0,0,0.4);
+            --shadow-lg: 0 8px 40px rgba(0,0,0,0.6);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            background-image:
+                radial-gradient(ellipse 80% 50% at 20% -10%, rgba(124,106,255,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 110%, rgba(167,139,250,0.08) 0%, transparent 60%);
+        }
+
+        /* ─── SCROLLBAR ───────────────────────────────── */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--surface); }
+        ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+        /* ─── HEADER ──────────────────────────────────── */
+        .header {
+            background: rgba(19, 22, 31, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
+            height: 68px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        .logo-icon {
+            width: 38px; height: 38px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 0 20px rgba(124,106,255,0.35);
+        }
+        .logo span { color: var(--text); }
+        .logo em { color: var(--accent2); font-style: normal; }
+
+        .header-right { display: flex; align-items: center; gap: 14px; }
+
+        .credits-pill {
+            display: flex; align-items: center; gap: 10px;
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            border-radius: 50px;
+            padding: 8px 18px 8px 12px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+        .credits-pill:hover {
+            border-color: var(--accent);
+            background: var(--surface3);
+            box-shadow: 0 0 20px rgba(124,106,255,0.2);
+        }
+        .credits-icon {
+            width: 30px; height: 30px;
+            background: linear-gradient(135deg, var(--gold), var(--gold2));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            box-shadow: 0 0 12px rgba(245,158,11,0.4);
+        }
+        .credits-count { font-size: 20px; font-weight: 700; color: var(--gold2); font-family: 'JetBrains Mono', monospace; }
+        .credits-label { font-size: 12px; color: var(--text3); }
+
+        .tooltip-badge {
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%; transform: translateX(-50%);
+            background: var(--surface3);
+            border: 1px solid var(--border2);
+            color: var(--text2);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .credits-pill:hover .tooltip-badge { opacity: 1; }
+
+        .btn-logout {
+            display: flex; align-items: center; gap: 8px;
+            padding: 9px 18px;
+            background: transparent;
+            border: 1px solid var(--border2);
+            border-radius: var(--radius-sm);
+            color: var(--text2);
+            font-family: 'Sora', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-logout:hover { border-color: var(--rose); color: var(--rose); background: rgba(244,63,94,0.08); }
+
+        /* ─── LAYOUT ──────────────────────────────────── */
+        .container { max-width: 1380px; margin: 0 auto; padding: 32px 28px; }
+
+        /* ─── STATS ROW ───────────────────────────────── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            transform: translate(25px, -25px);
+            transition: all 0.3s;
+        }
+        .stat-card:hover { border-color: var(--border2); transform: translateY(-3px); box-shadow: var(--shadow); }
+        .stat-card:hover::before { transform: translate(20px, -20px); }
+
+        .stat-card.credits::before { background: radial-gradient(circle, rgba(245,158,11,0.15), transparent 70%); }
+        .stat-card.docs::before    { background: radial-gradient(circle, rgba(124,106,255,0.15), transparent 70%); }
+        .stat-card.queries::before { background: radial-gradient(circle, rgba(16,185,129,0.15), transparent 70%); }
+        .stat-card.daily::before   { background: radial-gradient(circle, rgba(56,189,248,0.15), transparent 70%); }
+
+        .stat-icon-wrap {
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+        .stat-card.credits .stat-icon-wrap { background: rgba(245,158,11,0.15); color: var(--gold2); }
+        .stat-card.docs .stat-icon-wrap    { background: rgba(124,106,255,0.15); color: var(--accent2); }
+        .stat-card.queries .stat-icon-wrap { background: rgba(16,185,129,0.15); color: var(--emerald2); }
+        .stat-card.daily .stat-icon-wrap   { background: rgba(56,189,248,0.15); color: var(--sky); }
+
+        .stat-body { min-width: 0; }
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        .stat-card.credits .stat-value { color: var(--gold2); }
+        .stat-card.docs .stat-value    { color: var(--accent2); }
+        .stat-card.queries .stat-value { color: var(--emerald2); }
+        .stat-card.daily .stat-value   { color: var(--sky); }
+
+        .stat-label { font-size: 12px; color: var(--text3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.8px; }
+        .stat-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+        /* Progress bar inside credits card */
+        .stat-progress {
+            margin-top: 8px;
+            height: 4px;
+            background: var(--surface3);
+            border-radius: 2px;
+            overflow: hidden;
+            width: 100%;
+        }
+        .stat-progress-fill {
+            height: 100%;
+            border-radius: 2px;
+            background: linear-gradient(90deg, var(--gold), var(--gold2));
+            transition: width 0.6s ease;
+        }
+
+        /* ─── GRID ────────────────────────────────────── */
+        .main-grid { display: grid; grid-template-columns: 1fr 380px; gap: 24px; }
+
+        /* ─── PANELS ──────────────────────────────────── */
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+        .panel:last-child { margin-bottom: 0; }
+        .panel-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 22px;
+        }
+        .panel-title {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 16px; font-weight: 700;
+        }
+        .panel-title i { color: var(--accent2); }
+
+        /* ─── UPLOAD ZONE ─────────────────────────────── */
+        .upload-zone {
+            border: 2px dashed var(--border2);
+            border-radius: var(--radius-sm);
+            padding: 36px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(124,106,255,0.05);
+        }
+        .upload-zone input[type="file"] { display: none; }
+
+        .upload-icon {
+            width: 64px; height: 64px;
+            background: rgba(124,106,255,0.12);
+            border-radius: 18px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; color: var(--accent2);
+            margin: 0 auto 16px;
+            transition: all 0.25s;
+        }
+        .upload-zone:hover .upload-icon { background: rgba(124,106,255,0.2); transform: scale(1.05); }
+
+        .upload-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+        .upload-sub { font-size: 13px; color: var(--text3); margin-bottom: 18px; }
+
+        .btn-choose {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 22px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'Sora', sans-serif;
+            font-size: 14px; font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 4px 16px rgba(124,106,255,0.35);
+        }
+        .btn-choose:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,106,255,0.45); }
+
+        .upload-formats {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            margin-top: 14px; font-size: 12px; color: var(--text3);
+        }
+        .format-tag {
+            padding: 3px 10px;
+            background: var(--surface3);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text2);
+        }
+
+        /* ─── PROGRESS ────────────────────────────────── */
+        .progress-wrap { display: none; margin-top: 18px; }
+        .progress-track {
+            height: 8px;
+            background: var(--surface3);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .progress-label { font-size: 13px; color: var(--text2); text-align: center; }
+
+        /* ─── DUPLICATE ALERT ─────────────────────────── */
+        .duplicate-alert {
+            display: none;
+            margin-top: 16px;
+            padding: 16px 18px;
+            background: rgba(245,158,11,0.1);
+            border: 1px solid rgba(245,158,11,0.3);
+            border-radius: var(--radius-sm);
+            animation: slideDown 0.3s ease;
+        }
+        .duplicate-alert-header {
+            display: flex; align-items: center; gap: 8px;
+            font-weight: 600; color: var(--gold2);
+            margin-bottom: 8px; font-size: 14px;
+        }
+        .duplicate-alert-body { font-size: 13px; color: var(--text2); line-height: 1.6; }
+        .duplicate-doc-info {
+            margin-top: 10px;
+            padding: 10px 14px;
+            background: var(--surface3);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--text2);
+        }
+
+        /* ─── QUERY SECTION ───────────────────────────── */
+        .query-wrap { position: relative; }
+        .query-input {
+            width: 100%;
+            min-height: 130px;
+            padding: 18px 20px;
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            line-height: 1.7;
+            resize: vertical;
+            transition: all 0.2s;
+        }
+        .query-input::placeholder { color: var(--text3); }
+        .query-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,106,255,0.12); }
+
+        .query-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 14px;
+        }
+        .query-cost-tag {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 13px; color: var(--text3);
+        }
+        .query-cost-tag .cost { color: var(--gold2); font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+
+        .btn-search {
+            display: flex; align-items: center; gap: 9px;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'Sora', sans-serif;
+            font-size: 15px; font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 4px 16px rgba(124,106,255,0.35);
+        }
+        .btn-search:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(124,106,255,0.45); }
+        .btn-search:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* Thinking animation */
+        .thinking {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            background: var(--surface2);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+        .thinking-dots { display: flex; gap: 4px; }
+        .thinking-dots span {
+            width: 8px; height: 8px;
+            background: var(--accent2);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+        .thinking-dots span:nth-child(1) { animation-delay: 0s; }
+        .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+        .thinking-text { font-size: 13px; color: var(--text2); }
+
+        /* ─── ANSWER BOX ──────────────────────────────── */
+        .answer-box {
+            display: none;
+            margin-top: 20px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            animation: slideDown 0.4s ease;
+        }
+        .answer-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 18px;
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+        }
+        .answer-header-left { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; color: var(--accent2); }
+        .answer-credit-used {
+            font-size: 12px; color: var(--text3);
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--surface3);
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+        .answer-body {
+            padding: 20px;
+            line-height: 1.85;
+            font-size: 14px;
+            color: var(--text);
+            white-space: pre-wrap;
+        }
+
+        /* Contexts */
+        .contexts-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 18px;
+            background: var(--surface2);
+            border-top: 1px solid var(--border);
+            cursor: pointer;
+            font-size: 13px; color: var(--text2); font-weight: 600;
+        }
+        .contexts-header:hover { color: var(--text); }
+        .contexts-body { padding: 12px; display: none; }
+        .contexts-body.open { display: block; }
+
+        .ctx-item {
+            padding: 14px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+        .ctx-item:hover { border-color: var(--border2); border-left-color: var(--accent2); }
+        .ctx-meta { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .ctx-rank { font-size: 12px; font-weight: 600; color: var(--accent2); }
+        .ctx-score { font-size: 11px; color: var(--text3); font-family: 'JetBrains Mono', monospace; }
+        .ctx-source { font-size: 11px; color: var(--text3); }
+        .ctx-text { font-size: 13px; color: var(--text2); line-height: 1.65; }
+
+        /* ─── TOAST ───────────────────────────────────── */
+        .toast-container {
+            position: fixed;
+            top: 80px; right: 24px;
+            z-index: 999;
+            display: flex; flex-direction: column; gap: 10px;
+            pointer-events: none;
+        }
+        .toast {
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            min-width: 300px;
+            max-width: 380px;
+            display: flex; align-items: flex-start; gap: 12px;
+            box-shadow: var(--shadow-lg);
+            animation: toastIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: all;
+        }
+        .toast.removing { animation: toastOut 0.3s ease forwards; }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(40px) scale(0.95); }
+            to { opacity: 1; transform: translateX(0) scale(1); }
+        }
+        @keyframes toastOut {
+            to { opacity: 0; transform: translateX(40px) scale(0.95); }
+        }
+        .toast-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+        .toast.success .toast-icon { color: var(--emerald2); }
+        .toast.error   .toast-icon { color: var(--rose); }
+        .toast.warning .toast-icon { color: var(--gold2); }
+        .toast.info    .toast-icon { color: var(--sky); }
+        .toast-content { flex: 1; }
+        .toast-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+        .toast-body { font-size: 12px; color: var(--text2); }
+
+        /* ─── RIGHT SIDEBAR ───────────────────────────── */
+        /* Buy Credits card */
+        .buy-card {
+            background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 100%);
+            border: 1px solid rgba(124,106,255,0.3);
+            border-radius: var(--radius);
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .buy-card::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 150px; height: 150px;
+            background: radial-gradient(circle, rgba(167,139,250,0.2), transparent 70%);
+            pointer-events: none;
+        }
+        .buy-card:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(124,106,255,0.25); border-color: rgba(124,106,255,0.5); }
+        .buy-card-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; color: white; }
+        .buy-card-sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 18px; }
+        .buy-card-bottom { display: flex; justify-content: space-between; align-items: center; }
+        .buy-price { font-size: 24px; font-weight: 800; color: white; font-family: 'JetBrains Mono', monospace; }
+        .buy-price-sub { font-size: 12px; color: rgba(255,255,255,0.5); }
+        .buy-cta {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 13px; font-weight: 600;
+            font-family: 'Sora', sans-serif;
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        /* Documents list */
+        .doc-list { display: flex; flex-direction: column; gap: 10px; }
+        .doc-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            transition: all 0.2s;
+        }
+        .doc-item:hover { border-color: var(--border2); background: var(--surface3); }
+        .doc-file-icon {
+            width: 40px; height: 40px;
+            background: rgba(124,106,255,0.12);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; color: var(--accent2);
+            flex-shrink: 0;
+        }
+        .doc-body { flex: 1; min-width: 0; }
+        .doc-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .doc-meta { font-size: 11px; color: var(--text3); margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+        .doc-badge {
+            flex-shrink: 0;
+            font-size: 11px; font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+        .doc-badge.ready { background: rgba(16,185,129,0.15); color: var(--emerald2); }
+
+        /* Query history */
+        .history-list { display: flex; flex-direction: column; gap: 8px; }
+        .history-item {
+            padding: 12px 14px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .history-item:hover { border-color: var(--accent); background: var(--surface3); }
+        .history-q { font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+        .history-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); }
+        .history-credits { color: var(--rose); font-family: 'JetBrains Mono', monospace; }
+
+        /* Empty state */
+        .empty-state {
+            padding: 30px 20px;
+            text-align: center;
+            color: var(--text3);
+        }
+        .empty-state i { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
+        .empty-state p { font-size: 13px; }
+
+        /* ─── ANIMATIONS ──────────────────────────────── */
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* ─── RESPONSIVE ──────────────────────────────── */
+        @media (max-width: 1100px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 640px) {
+            .stats-row { grid-template-columns: 1fr; }
+            .container { padding: 20px 16px; }
+            .header { padding: 0 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- HEADER -->
+<header class="header">
+    <div class="logo">
+        <div class="logo-icon">📜</div>
+        <span>Sanskrit<em>RAG</em></span>
+    </div>
+    <div class="header-right">
+        <div class="credits-pill" onclick="window.location.href='/pricing'">
+            <div class="credits-icon">🪙</div>
+            <div>
+                <div class="credits-count" id="creditsDisplay">{{ user.credits }}</div>
+                <div class="credits-label">credits</div>
+            </div>
+            <div class="tooltip-badge">Click to buy more credits</div>
+        </div>
+        <span style="color:var(--text3);font-size:13px;">{{ session.username }}</span>
+        <button class="btn-logout" onclick="window.location.href='/logout'">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+    </div>
+</header>
+
+<!-- MAIN -->
+<main class="container">
+
+    <!-- STATS ROW -->
+    <div class="stats-row">
+        <!-- Credits -->
+        <div class="stat-card credits">
+            <div class="stat-icon-wrap"><i class="fas fa-coins"></i></div>
+            <div class="stat-body" style="flex:1">
+                <div class="stat-value" id="statCredits">{{ user.credits }}</div>
+                <div class="stat-label">Available Credits</div>
+                <div class="stat-sub">{{ query_cost }} credits per query</div>
+                <div class="stat-progress">
+                    <div class="stat-progress-fill" id="creditProgressBar" style="width: {{ [user.credits, 100] | min }}%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documents -->
+        <div class="stat-card docs">
+            <div class="stat-icon-wrap"><i class="fas fa-file-alt"></i></div>
+            <div class="stat-body">
+                <div class="stat-value">{{ documents | length }}</div>
+                <div class="stat-label">Documents Uploaded</div>
+                <div class="stat-sub">in the knowledge base</div>
+            </div>
+        </div>
+
+        <!-- Queries -->
+        <div class="stat-card queries">
+            <div class="stat-icon-wrap"><i class="fas fa-search"></i></div>
+            <div class="stat-body">
+                <div class="stat-value">{{ total_queries }}</div>
+                <div class="stat-label">Total Queries</div>
+                <div class="stat-sub">across all sessions</div>
+            </div>
+        </div>
+
+        <!-- Daily Free -->
+        <div class="stat-card daily">
+            <div class="stat-icon-wrap"><i class="fas fa-gift"></i></div>
+            <div class="stat-body">
+                <div class="stat-value">+{{ daily_free }}</div>
+                <div class="stat-label">Daily Free Credits</div>
+                <div class="stat-sub">refreshes every 24 hrs</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="main-grid">
+
+        <!-- LEFT: Upload + Query -->
+        <div>
+            <!-- Upload Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        Upload Sanskrit Document
+                    </div>
+                    <span style="font-size:12px;color:var(--text3);">Max 16 MB</span>
+                </div>
+
+                <div class="upload-zone" id="uploadZone">
+                    <div class="upload-icon"><i class="fas fa-file-arrow-up"></i></div>
+                    <div class="upload-title">Drop your file here</div>
+                    <div class="upload-sub">or click to browse from your computer</div>
+                    <button class="btn-choose" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-folder-open"></i> Choose File
+                    </button>
+                    <input type="file" id="fileInput" accept=".txt,.docx">
+                    <div class="upload-formats">
+                        <span style="color:var(--text3);">Supported:</span>
+                        <span class="format-tag">.txt</span>
+                        <span class="format-tag">.docx</span>
+                    </div>
+                </div>
+
+                <!-- Progress -->
+                <div class="progress-wrap" id="progressWrap">
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-label" id="progressLabel">Uploading…</div>
+                </div>
+
+                <!-- Duplicate Alert -->
+                <div class="duplicate-alert" id="duplicateAlert">
+                    <div class="duplicate-alert-header">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        Document Already Exists
+                    </div>
+                    <div class="duplicate-alert-body" id="duplicateAlertBody">
+                        This file has already been uploaded and indexed.
+                    </div>
+                    <div class="duplicate-doc-info" id="duplicateDocInfo"></div>
+                </div>
+            </div>
+
+            <!-- Query Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <i class="fas fa-magnifying-glass"></i>
+                        Ask a Question
+                    </div>
+                </div>
+
+                <div class="query-wrap">
+                    <textarea
+                        class="query-input"
+                        id="queryInput"
+                        placeholder="Type your question in Sanskrit (Devanāgarī) or English…
+
+Examples:
+• कालीदासः कः आसीत्?
+• What is the story about the old woman?
+• Tell me about Bhoj Raja"></textarea>
+
+                    <div class="query-footer">
+                        <div class="query-cost-tag">
+                            <i class="fas fa-info-circle"></i>
+                            Each query costs <span class="cost">{{ query_cost }}</span> credits
+                        </div>
+                        <button class="btn-search" id="queryBtn" onclick="submitQuery()">
+                            <i class="fas fa-paper-plane"></i> Search
+                        </button>
+                    </div>
+
+                    <!-- Thinking -->
+                    <div class="thinking" id="thinkingBox">
+                        <div class="thinking-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <div class="thinking-text">Processing with RAG system…</div>
+                    </div>
+
+                    <!-- Answer -->
+                    <div class="answer-box" id="answerBox">
+                        <div class="answer-header">
+                            <div class="answer-header-left">
+                                <i class="fas fa-lightbulb"></i> Answer
+                            </div>
+                            <span class="answer-credit-used" id="answerCreditTag">−3 credits</span>
+                        </div>
+                        <div class="answer-body" id="answerText"></div>
+                        <div class="contexts-header" onclick="toggleContexts(this)">
+                            <span><i class="fas fa-book"></i> Retrieved Contexts <span id="ctxCount"></span></span>
+                            <i class="fas fa-chevron-down" style="transition:transform 0.2s;"></i>
+                        </div>
+                        <div class="contexts-body" id="contextsBody"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT SIDEBAR -->
+        <div>
+            <!-- Buy Credits -->
+            <div class="buy-card" onclick="window.location.href='/pricing'">
+                <div class="buy-card-title">⚡ Need More Credits?</div>
+                <div class="buy-card-sub">Keep your Sanskrit research going without interruption.</div>
+                <div class="buy-card-bottom">
+                    <div>
+                        <div class="buy-price">₹99</div>
+                        <div class="buy-price-sub">50+ credits</div>
+                    </div>
+                    <div class="buy-cta">View Plans <i class="fas fa-arrow-right"></i></div>
+                </div>
+            </div>
+
+            <!-- Documents -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <i class="fas fa-folder-open"></i> Knowledge Base
+                    </div>
+                    <span style="font-size:12px;font-family:'JetBrains Mono';color:var(--accent2);">{{ documents|length }} docs</span>
+                </div>
+                <div class="doc-list" id="docList">
+                    {% if documents %}
+                        {% for doc in documents %}
+                        <div class="doc-item">
+                            <div class="doc-file-icon">
+                                {% if doc.filename.endswith('.docx') %}📄{% else %}📝{% endif %}
+                            </div>
+                            <div class="doc-body">
+                                <div class="doc-name" title="{{ doc.filename }}">{{ doc.filename }}</div>
+                                <div class="doc-meta">
+                                    {{ doc.upload_date.strftime('%d %b %Y') }} &bull; {{ doc.chunks_count }} chunks
+                                </div>
+                            </div>
+                            <span class="doc-badge ready">✓ Ready</span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-folder-open"></i>
+                            <p>No documents yet.<br>Upload your first file above!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Recent Queries -->
+            {% if recent_queries %}
+            <div class="panel" style="margin-top:24px;">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <i class="fas fa-clock-rotate-left"></i> Recent Queries
+                    </div>
+                </div>
+                <div class="history-list">
+                    {% for q in recent_queries %}
+                    <div class="history-item" onclick="loadQuery(`{{ q.query_text | replace('`','\\`') }}`)">
+                        <div class="history-q">{{ q.query_text }}</div>
+                        <div class="history-meta">
+                            <span>{{ q.timestamp.strftime('%d %b, %I:%M %p') }}</span>
+                            <span class="history-credits">−{{ q.credits_used }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</main>
+
+<script>
+    // ── State ───────────────────────────────────────────────────────────────
+    let currentCredits = {{ user.credits }};
+    const QUERY_COST = {{ query_cost }};
+
+    // ── Toast System ────────────────────────────────────────────────────────
+    function toast(title, body = '', type = 'info', duration = 4500) {
+        const icons = { success: 'fa-circle-check', error: 'fa-circle-xmark', warning: 'fa-triangle-exclamation', info: 'fa-circle-info' };
+        const t = document.createElement('div');
+        t.className = `toast ${type}`;
+        t.innerHTML = `
+            <div class="toast-icon"><i class="fas ${icons[type] || icons.info}"></i></div>
+            <div class="toast-content">
+                <div class="toast-title">${title}</div>
+                ${body ? `<div class="toast-body">${body}</div>` : ''}
+            </div>`;
+        document.getElementById('toastContainer').appendChild(t);
+        setTimeout(() => {
+            t.classList.add('removing');
+            t.addEventListener('animationend', () => t.remove());
+        }, duration);
+    }
+
+    // ── Credits Update ──────────────────────────────────────────────────────
+    function updateCredits(n) {
+        currentCredits = n;
+        document.getElementById('creditsDisplay').textContent = n;
+        document.getElementById('statCredits').textContent = n;
+        const pct = Math.min(n, 100);
+        document.getElementById('creditProgressBar').style.width = pct + '%';
+    }
+
+    // ── Upload ──────────────────────────────────────────────────────────────
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput  = document.getElementById('fileInput');
+
+    ['dragenter','dragover','dragleave','drop'].forEach(e => uploadZone.addEventListener(e, ev => ev.preventDefault()));
+    ['dragenter','dragover'].forEach(e => uploadZone.addEventListener(e, () => uploadZone.classList.add('dragover')));
+    ['dragleave','drop'].forEach(e => uploadZone.addEventListener(e, () => uploadZone.classList.remove('dragover')));
+    uploadZone.addEventListener('drop', ev => { const f = ev.dataTransfer.files[0]; if (f) handleUpload(f); });
+    fileInput.addEventListener('change', function () { if (this.files[0]) handleUpload(this.files[0]); });
+
+    function setProgress(pct, label) {
+        document.getElementById('progressFill').style.width = pct + '%';
+        document.getElementById('progressLabel').textContent = label;
+    }
+
+    function showDuplicateAlert(msg, docInfo) {
+        const el = document.getElementById('duplicateAlert');
+        document.getElementById('duplicateAlertBody').textContent = msg;
+        document.getElementById('duplicateDocInfo').textContent =
+            `📄 ${docInfo.filename}  ·  Uploaded: ${docInfo.upload_date}  ·  ${docInfo.chunks_count} chunks`;
+        el.style.display = 'block';
+        setTimeout(() => { el.style.display = 'none'; }, 8000);
+    }
+
+    async function handleUpload(file) {
+        document.getElementById('duplicateAlert').style.display = 'none';
+        document.getElementById('progressWrap').style.display = 'block';
+        uploadZone.style.opacity = '0.5';
+        uploadZone.style.pointerEvents = 'none';
+
+        let pct = 0;
+        const ticker = setInterval(() => {
+            if (pct < 85) { pct += 8; setProgress(pct, 'Uploading & indexing…'); }
+        }, 200);
+
+        const fd = new FormData();
+        fd.append('file', file);
+
+        try {
+            const res  = await fetch('/api/upload_document', { method: 'POST', body: fd });
+            const data = await res.json();
+            clearInterval(ticker);
+
+            if (data.success) {
+                setProgress(100, '✓ Indexed successfully');
+                toast('Upload Complete', `"${file.name}" added — ${data.new_chunks} new chunks. Total: ${data.total_chunks}`, 'success', 5000);
+                setTimeout(() => location.reload(), 1600);
+            } else if (data.duplicate) {
+                setProgress(0, '');
+                document.getElementById('progressWrap').style.display = 'none';
+                showDuplicateAlert(
+                    `"${data.existing_doc.filename}" was already uploaded on ${data.existing_doc.upload_date}. Rename the file if you want to add a new version.`,
+                    data.existing_doc
+                );
+                toast('Duplicate Document', 'This file is already in the knowledge base.', 'warning');
+            } else {
+                setProgress(0, 'Failed');
+                toast('Upload Failed', data.message, 'error');
+            }
+        } catch (err) {
+            clearInterval(ticker);
+            setProgress(0, 'Error');
+            toast('Network Error', 'Could not reach the server. Try again.', 'error');
+        } finally {
+            uploadZone.style.opacity = '1';
+            uploadZone.style.pointerEvents = 'auto';
+            fileInput.value = '';
+        }
+    }
+
+    // ── Query ───────────────────────────────────────────────────────────────
+    async function submitQuery() {
+        const q = document.getElementById('queryInput').value.trim();
+        if (!q) { toast('Empty Query', 'Please type a question first.', 'warning'); return; }
+
+        if (currentCredits < QUERY_COST) {
+            toast('Insufficient Credits', `You need ${QUERY_COST} credits. Buy more to continue.`, 'error');
+            setTimeout(() => { if (confirm('Open pricing page?')) window.location.href = '/pricing'; }, 300);
+            return;
+        }
+
+        const btn = document.getElementById('queryBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching…';
+        document.getElementById('thinkingBox').style.display = 'flex';
+        document.getElementById('answerBox').style.display = 'none';
+
+        try {
+            const res  = await fetch('/api/query', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query: q })
+            });
+            const data = await res.json();
+
+            document.getElementById('thinkingBox').style.display = 'none';
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Search';
+
+            if (data.success) {
+                // Populate answer
+                document.getElementById('answerText').textContent  = data.answer;
+                document.getElementById('answerCreditTag').textContent = `−${data.credits_used} credits`;
+                document.getElementById('answerBox').style.display  = 'block';
+
+                // Contexts
+                const ctxBody = document.getElementById('contextsBody');
+                ctxBody.innerHTML = '';
+                ctxBody.classList.remove('open');
+                if (data.contexts && data.contexts.length) {
+                    document.getElementById('ctxCount').textContent = `(${data.contexts.length})`;
+                    data.contexts.forEach((ctx, i) => {
+                        const div = document.createElement('div');
+                        div.className = 'ctx-item';
+                        div.innerHTML = `
+                            <div class="ctx-meta">
+                                <span class="ctx-rank">Context ${i+1}</span>
+                                <span class="ctx-score">Score: ${(ctx.score*100).toFixed(1)}%</span>
+                            </div>
+                            <div class="ctx-source">${ctx.source}</div>
+                            <div class="ctx-text" style="margin-top:6px;">${ctx.text.substring(0,280)}${ctx.text.length>280?'…':''}</div>`;
+                        ctxBody.appendChild(div);
+                    });
+                }
+
+                updateCredits(data.credits_remaining);
+                toast('Query Successful', `${data.credits_used} credits used · ${data.credits_remaining} remaining`, 'success');
+                document.getElementById('answerBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+                toast('Query Failed', data.message, 'error');
+            }
+        } catch (err) {
+            document.getElementById('thinkingBox').style.display = 'none';
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Search';
+            toast('Network Error', 'Could not reach the server.', 'error');
+        }
+    }
+
+    function toggleContexts(header) {
+        const body = document.getElementById('contextsBody');
+        const icon = header.querySelector('.fa-chevron-down');
+        body.classList.toggle('open');
+        icon.style.transform = body.classList.contains('open') ? 'rotate(180deg)' : '';
+    }
+
+    function loadQuery(text) {
+        document.getElementById('queryInput').value = text;
+        document.getElementById('queryInput').scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('queryInput').focus();
+    }
+
+    // Enter = submit, Shift+Enter = newline
+    document.getElementById('queryInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitQuery(); }
+    });
+
+    // Daily credit bonus notification
+    {% if credits_added %}
+    setTimeout(() => toast('Daily Bonus!', 'You received {{ daily_free }} free credits today 🎉', 'success', 5000), 600);
+    {% endif %}
+</script>
+</body>
+</html>

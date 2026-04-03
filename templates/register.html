@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register — Sanskrit RAG</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0d0f14;
+            --surface: #13161f;
+            --surface2: #1a1e2b;
+            --surface3: #222738;
+            --border: #2a2f42;
+            --border2: #343b54;
+            --accent: #7c6aff;
+            --accent2: #a78bfa;
+            --accent3: #c4b5fd;
+            --gold: #f59e0b;
+            --gold2: #fbbf24;
+            --emerald2: #34d399;
+            --rose: #f43f5e;
+            --sky: #38bdf8;
+            --text: #e2e8f0;
+            --text2: #94a3b8;
+            --text3: #64748b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        /* ── LEFT ────────────────────────────────── */
+        .panel-left {
+            position: relative; overflow: hidden;
+            background: linear-gradient(160deg, #0a0e1a 0%, #0f1535 50%, #0a1420 100%);
+            display: flex; flex-direction: column;
+            padding: 40px 56px;
+        }
+        .panel-left::before {
+            content: '';
+            position: absolute; top: -80px; right: -80px;
+            width: 450px; height: 450px;
+            background: radial-gradient(circle, rgba(56,189,248,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .panel-left::after {
+            content: '';
+            position: absolute; bottom: -60px; left: -60px;
+            width: 350px; height: 350px;
+            background: radial-gradient(circle, rgba(124,106,255,0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .glyph {
+            position: absolute;
+            font-family: 'JetBrains Mono', monospace;
+            color: rgba(56,189,248,0.06);
+            pointer-events: none;
+            animation: floatGlyph linear infinite;
+            user-select: none;
+        }
+        @keyframes floatGlyph {
+            from { transform: translateY(100vh); opacity: 0; }
+            10%, 90% { opacity: 1; }
+            to { transform: translateY(-100px); opacity: 0; }
+        }
+
+        .left-nav {
+            position: relative; z-index: 1;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .logo-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+            box-shadow: 0 0 20px rgba(124,106,255,0.4);
+        }
+        .logo-text { font-size: 18px; font-weight: 800; }
+        .logo-text em { color: var(--accent2); font-style: normal; }
+
+        .back-link {
+            display: inline-flex; align-items: center; gap: 7px;
+            margin-top: 8px; font-size: 13px; color: var(--text3);
+            text-decoration: none; transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--text2); }
+
+        .left-body {
+            position: relative; z-index: 1;
+            flex: 1; display: flex; flex-direction: column; justify-content: center;
+            padding: 32px 0;
+        }
+
+        .left-eyebrow {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 11px; font-weight: 700; letter-spacing: 2px;
+            color: var(--sky); text-transform: uppercase; margin-bottom: 20px;
+        }
+
+        .left-title {
+            font-size: clamp(30px, 3vw, 44px);
+            font-weight: 800; letter-spacing: -1.5px; line-height: 1.1;
+            margin-bottom: 14px;
+        }
+        .left-title .grad {
+            background: linear-gradient(135deg, var(--sky), var(--accent2));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .left-sub { font-size: 14px; color: var(--text2); line-height: 1.7; margin-bottom: 32px; max-width: 380px; }
+
+        /* Bonus card */
+        .bonus-card {
+            padding: 22px 24px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            margin-bottom: 20px;
+        }
+        .bonus-card-title {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 14px; font-weight: 700; margin-bottom: 14px;
+            color: var(--gold2);
+        }
+        .bonus-rows { display: flex; flex-direction: column; gap: 10px; }
+        .bonus-row {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 13px; color: var(--text2);
+        }
+        .bonus-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px; font-weight: 700;
+            padding: 3px 10px; border-radius: 20px;
+        }
+        .bonus-badge.gold   { background: rgba(245,158,11,0.15); color: var(--gold2); }
+        .bonus-badge.violet { background: rgba(124,106,255,0.15); color: var(--accent2); }
+        .bonus-badge.sky    { background: rgba(56,189,248,0.15); color: var(--sky); }
+
+        .perk-list { display: flex; flex-direction: column; gap: 10px; }
+        .perk {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 13px; color: var(--text2);
+        }
+        .perk i { color: var(--accent2); font-size: 12px; }
+
+        .left-footer {
+            position: relative; z-index: 1;
+            font-size: 12px; color: var(--text3);
+            font-family: 'JetBrains Mono', monospace; letter-spacing: 2px;
+        }
+
+        /* ── RIGHT ───────────────────────────────── */
+        .panel-right {
+            background: var(--bg);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 48px 64px;
+            position: relative;
+        }
+        .panel-right::before {
+            content: '';
+            position: absolute; top: 0; left: 0;
+            width: 1px; height: 100%;
+            background: linear-gradient(180deg, transparent, var(--border), transparent);
+        }
+
+        .form-card { width: 100%; max-width: 420px; }
+
+        .form-header { margin-bottom: 30px; }
+        .form-header h2 { font-size: 28px; font-weight: 800; letter-spacing: -0.8px; margin-bottom: 8px; }
+        .form-header p { font-size: 14px; color: var(--text2); }
+
+        .alert-box {
+            display: none; padding: 12px 16px;
+            border-radius: 10px; margin-bottom: 18px;
+            font-size: 13px; font-weight: 500;
+            animation: slideDown 0.3s ease;
+        }
+        .alert-box.success { background: rgba(52,211,153,0.12); border: 1px solid rgba(52,211,153,0.25); color: var(--emerald2); }
+        .alert-box.error   { background: rgba(244,63,94,0.1); border: 1px solid rgba(244,63,94,0.25); color: var(--rose); }
+        @keyframes slideDown { from { opacity:0;transform:translateY(-8px);} to { opacity:1;transform:translateY(0);} }
+
+        .field { margin-bottom: 18px; }
+        .field label { display: block; font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 7px; }
+
+        .input-wrap { position: relative; }
+        .input-wrap .icon {
+            position: absolute; left: 14px; top: 50%;
+            transform: translateY(-50%);
+            color: var(--text3); font-size: 14px; pointer-events: none;
+        }
+
+        .field-input {
+            width: 100%;
+            padding: 13px 14px 13px 42px;
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .field-input::placeholder { color: var(--text3); }
+        .field-input:focus {
+            outline: none; border-color: var(--accent);
+            background: var(--surface3);
+            box-shadow: 0 0 0 3px rgba(124,106,255,0.12);
+        }
+
+        /* strength meter */
+        .pw-strength { margin-top: 8px; }
+        .strength-bar {
+            height: 3px; background: var(--surface3);
+            border-radius: 2px; overflow: hidden; margin-bottom: 4px;
+        }
+        .strength-fill {
+            height: 100%; border-radius: 2px;
+            width: 0%; transition: width 0.3s, background 0.3s;
+        }
+        .strength-label { font-size: 11px; color: var(--text3); }
+
+        .pw-toggle {
+            position: absolute; right: 14px; top: 50%;
+            transform: translateY(-50%);
+            color: var(--text3); cursor: pointer;
+            font-size: 14px; background: none; border: none;
+            padding: 0; transition: color 0.2s;
+        }
+        .pw-toggle:hover { color: var(--text2); }
+
+        /* Terms */
+        .terms-row {
+            display: flex; align-items: flex-start; gap: 10px;
+            margin-bottom: 18px; font-size: 13px; color: var(--text3);
+            cursor: pointer;
+        }
+        .terms-row input[type="checkbox"] { accent-color: var(--accent); margin-top: 2px; flex-shrink: 0; }
+
+        .btn-submit {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border: none; border-radius: 10px; color: white;
+            font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700;
+            cursor: pointer; transition: all 0.25s;
+            box-shadow: 0 4px 20px rgba(124,106,255,0.35);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(124,106,255,0.45); }
+        .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .divider {
+            display: flex; align-items: center; gap: 12px;
+            margin: 20px 0; font-size: 12px; color: var(--text3);
+        }
+        .divider::before, .divider::after { content:''; flex:1; height:1px; background: var(--border); }
+
+        .form-footer { text-align: center; font-size: 13px; color: var(--text3); }
+        .form-footer a { color: var(--accent2); text-decoration: none; font-weight: 600; }
+        .form-footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 900px) {
+            body { grid-template-columns: 1fr; }
+            .panel-left { display: none; }
+            .panel-right { padding: 40px 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LEFT -->
+    <div class="panel-left">
+        <div class="glyph" style="left:20%;font-size:48px;animation-duration:18s;animation-delay:0s;">ॐ</div>
+        <div class="glyph" style="left:65%;font-size:30px;animation-duration:22s;animation-delay:6s;">ॐ</div>
+        <div class="glyph" style="left:40%;font-size:24px;animation-duration:26s;animation-delay:12s;">श्री</div>
+        <div class="glyph" style="left:80%;font-size:42px;animation-duration:20s;animation-delay:4s;">ॐ</div>
+
+        <div class="left-nav">
+            <div class="logo-icon">📜</div>
+            <span class="logo-text">Sanskrit<em>RAG</em></span>
+        </div>
+        <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Back to home</a>
+
+        <div class="left-body">
+            <div class="left-eyebrow"><i class="fas fa-star"></i> Join the community</div>
+            <div class="left-title">
+                Start your<br>
+                <span class="grad">free account</span>
+            </div>
+            <p class="left-sub">Everything you need to explore Sanskrit literature — upload documents, ask questions, and discover ancient wisdom.</p>
+
+            <div class="bonus-card">
+                <div class="bonus-card-title"><i class="fas fa-gift"></i> Welcome Bonus</div>
+                <div class="bonus-rows">
+                    <div class="bonus-row">
+                        <span class="bonus-badge gold">+20</span>
+                        Free credits on signup
+                    </div>
+                    <div class="bonus-row">
+                        <span class="bonus-badge sky">+10</span>
+                        Free credits every 24 hours
+                    </div>
+                    <div class="bonus-row">
+                        <span class="bonus-badge violet">3</span>
+                        Credits per query
+                    </div>
+                </div>
+            </div>
+
+            <div class="perk-list">
+                <div class="perk"><i class="fas fa-check"></i> Upload Sanskrit documents (.txt, .docx)</div>
+                <div class="perk"><i class="fas fa-check"></i> Bilingual queries — Sanskrit & English</div>
+                <div class="perk"><i class="fas fa-check"></i> Full query history saved automatically</div>
+                <div class="perk"><i class="fas fa-check"></i> Additive knowledge base — no data lost</div>
+            </div>
+        </div>
+
+        <div class="left-footer">ॐ तत् सत् &nbsp;·&nbsp; सर्वे भवन्तु सुखिनः</div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="panel-right">
+        <div class="form-card">
+            <div class="form-header">
+                <h2>Create account</h2>
+                <p>Free forever. No credit card required.</p>
+            </div>
+
+            <div class="alert-box" id="alertBox"></div>
+
+            <form id="registerForm" autocomplete="on">
+                <div class="field">
+                    <label for="username">Username</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-user icon"></i>
+                        <input class="field-input" type="text" id="username" name="username"
+                               placeholder="choose_a_username" autocomplete="username"
+                               required minlength="3">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="email">Email</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-envelope icon"></i>
+                        <input class="field-input" type="email" id="email" name="email"
+                               placeholder="you@example.com" autocomplete="email" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="password">Password</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-lock icon"></i>
+                        <input class="field-input" type="password" id="password" name="password"
+                               placeholder="min. 6 characters" autocomplete="new-password"
+                               required minlength="6" oninput="checkStrength(this.value)">
+                        <button type="button" class="pw-toggle" onclick="togglePw(this)" tabindex="-1">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="pw-strength">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strengthFill"></div>
+                        </div>
+                        <div class="strength-label" id="strengthLabel"></div>
+                    </div>
+                </div>
+
+                <label class="terms-row">
+                    <input type="checkbox" id="termsCheck" required>
+                    <span>I agree to the <a href="#" style="color:var(--accent2);text-decoration:none;">terms of service</a> and understand that each query costs 3 credits.</span>
+                </label>
+
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <i class="fas fa-user-plus"></i> Create Account — Free
+                </button>
+            </form>
+
+            <div class="divider">already a member?</div>
+
+            <div class="form-footer">
+                <a href="/login">Sign in to your account →</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePw(btn) {
+            const input = btn.closest('.input-wrap').querySelector('input');
+            const icon  = btn.querySelector('i');
+            const show  = input.type === 'password';
+            input.type  = show ? 'text' : 'password';
+            icon.className = show ? 'fas fa-eye-slash' : 'fas fa-eye';
+        }
+
+        function checkStrength(val) {
+            const fill  = document.getElementById('strengthFill');
+            const label = document.getElementById('strengthLabel');
+            let strength = 0;
+            if (val.length >= 6)  strength++;
+            if (val.length >= 10) strength++;
+            if (/[A-Z]/.test(val) && /[0-9]/.test(val)) strength++;
+            if (/[^A-Za-z0-9]/.test(val)) strength++;
+
+            const levels = [
+                { w: '0%',   bg: 'transparent', txt: '' },
+                { w: '30%',  bg: 'var(--rose)',     txt: 'Weak' },
+                { w: '55%',  bg: 'var(--gold)',     txt: 'Fair' },
+                { w: '78%',  bg: 'var(--sky)',      txt: 'Good' },
+                { w: '100%', bg: 'var(--emerald2)', txt: 'Strong 💪' },
+            ];
+            const lv = val.length === 0 ? levels[0] : levels[Math.min(strength + 1, 4)];
+            fill.style.width      = lv.w;
+            fill.style.background = lv.bg;
+            label.textContent     = lv.txt;
+        }
+
+        function showAlert(msg, type) {
+            const el = document.getElementById('alertBox');
+            el.textContent   = msg;
+            el.className     = `alert-box ${type}`;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 5500);
+        }
+
+        document.getElementById('registerForm').addEventListener('submit', async e => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account…';
+
+            try {
+                const res  = await fetch('/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: document.getElementById('username').value.trim(),
+                        email:    document.getElementById('email').value.trim(),
+                        password: document.getElementById('password').value
+                    })
+                });
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    showAlert('🎉 ' + data.message, 'success');
+                    btn.innerHTML = '<i class="fas fa-check"></i> Redirecting…';
+                    setTimeout(() => window.location.href = '/login', 1600);
+                } else {
+                    showAlert(data.message || 'Registration failed', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account — Free';
+                }
+            } catch {
+                showAlert('Network error. Please try again.', 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account — Free';
+            }
+        });
+    </script>
+</body>
+</html>

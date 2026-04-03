@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanskrit RAG — Unlock Ancient Wisdom</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0d0f14;
+            --surface: #13161f;
+            --surface2: #1a1e2b;
+            --surface3: #222738;
+            --border: #2a2f42;
+            --border2: #343b54;
+            --accent: #7c6aff;
+            --accent2: #a78bfa;
+            --accent3: #c4b5fd;
+            --gold: #f59e0b;
+            --gold2: #fbbf24;
+            --emerald: #10b981;
+            --emerald2: #34d399;
+            --rose: #f43f5e;
+            --sky: #38bdf8;
+            --text: #e2e8f0;
+            --text2: #94a3b8;
+            --text3: #64748b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--surface); }
+        ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+        /* ── NOISE OVERLAY ───────────────────────── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        /* ── GRADIENT ORBS ───────────────────────── */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .orb-1 {
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(124,106,255,0.12) 0%, transparent 70%);
+            top: -200px; left: -100px;
+            animation: drift 20s ease-in-out infinite alternate;
+        }
+        .orb-2 {
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(167,139,250,0.08) 0%, transparent 70%);
+            bottom: -150px; right: -100px;
+            animation: drift 25s ease-in-out infinite alternate-reverse;
+        }
+        .orb-3 {
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(245,158,11,0.06) 0%, transparent 70%);
+            top: 50%; left: 50%;
+            animation: drift 30s ease-in-out infinite alternate;
+        }
+        @keyframes drift {
+            from { transform: translate(0, 0); }
+            to { transform: translate(40px, 30px); }
+        }
+
+        /* ── NAV ─────────────────────────────────── */
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 48px;
+            height: 68px;
+            background: rgba(13, 15, 20, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-logo {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 20px; font-weight: 800; letter-spacing: -0.5px;
+        }
+        .nav-logo-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 17px;
+            box-shadow: 0 0 20px rgba(124,106,255,0.35);
+        }
+        .nav-logo em { color: var(--accent2); font-style: normal; }
+
+        .nav-actions { display: flex; align-items: center; gap: 12px; }
+
+        .btn-ghost {
+            padding: 9px 20px;
+            background: transparent;
+            border: 1px solid var(--border2);
+            border-radius: 10px;
+            color: var(--text2);
+            font-family: 'Sora', sans-serif;
+            font-size: 14px; font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-ghost:hover { border-color: var(--accent2); color: var(--accent2); background: rgba(124,106,255,0.06); }
+
+        .btn-accent {
+            padding: 9px 22px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-family: 'Sora', sans-serif;
+            font-size: 14px; font-weight: 600;
+            text-decoration: none;
+            transition: all 0.25s;
+            box-shadow: 0 4px 16px rgba(124,106,255,0.3);
+        }
+        .btn-accent:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,106,255,0.45); }
+
+        /* ── HERO ────────────────────────────────── */
+        .hero {
+            position: relative; z-index: 1;
+            min-height: calc(100vh - 68px);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center;
+            padding: 80px 24px;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 6px 16px;
+            background: rgba(124,106,255,0.1);
+            border: 1px solid rgba(124,106,255,0.25);
+            border-radius: 50px;
+            font-size: 12px; font-weight: 600;
+            color: var(--accent2);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 28px;
+            animation: fadeUp 0.6s ease backwards;
+        }
+
+        .hero h1 {
+            font-size: clamp(42px, 7vw, 80px);
+            font-weight: 800;
+            letter-spacing: -2px;
+            line-height: 1.05;
+            margin-bottom: 24px;
+            animation: fadeUp 0.6s ease 0.1s backwards;
+        }
+        .hero h1 .line-accent {
+            background: linear-gradient(135deg, var(--accent2), var(--accent3), var(--sky));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            font-size: clamp(16px, 2vw, 19px);
+            color: var(--text2);
+            max-width: 600px;
+            line-height: 1.7;
+            margin-bottom: 44px;
+            animation: fadeUp 0.6s ease 0.2s backwards;
+        }
+
+        .hero-cta {
+            display: flex; align-items: center; gap: 16px;
+            flex-wrap: wrap; justify-content: center;
+            animation: fadeUp 0.6s ease 0.3s backwards;
+        }
+
+        .btn-hero-primary {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 16px 36px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border: none; border-radius: 12px;
+            color: white;
+            font-family: 'Sora', sans-serif;
+            font-size: 16px; font-weight: 700;
+            text-decoration: none;
+            transition: all 0.25s;
+            box-shadow: 0 8px 32px rgba(124,106,255,0.4);
+        }
+        .btn-hero-primary:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(124,106,255,0.5); }
+
+        .btn-hero-ghost {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 15px 32px;
+            background: transparent;
+            border: 1px solid var(--border2);
+            border-radius: 12px;
+            color: var(--text2);
+            font-family: 'Sora', sans-serif;
+            font-size: 16px; font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-hero-ghost:hover { border-color: var(--accent2); color: var(--text); background: rgba(124,106,255,0.06); }
+
+        /* Sanskrit text decoration */
+        .sanskrit-deco {
+            margin-top: 60px;
+            font-size: 13px;
+            color: var(--text3);
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 3px;
+            animation: fadeUp 0.6s ease 0.5s backwards;
+        }
+
+        /* ── STATS STRIP ─────────────────────────── */
+        .stats-strip {
+            position: relative; z-index: 1;
+            display: flex; justify-content: center;
+            padding: 0 24px 80px;
+            animation: fadeUp 0.6s ease 0.4s backwards;
+        }
+
+        .stats-inner {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            max-width: 860px;
+            width: 100%;
+        }
+
+        .stat-cell {
+            background: var(--surface);
+            padding: 28px 32px;
+            text-align: center;
+        }
+        .stat-cell:hover { background: var(--surface2); }
+
+        .stat-num {
+            font-size: 32px; font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+        .stat-num .accent { color: var(--accent2); }
+
+        .stat-desc { font-size: 12px; color: var(--text3); font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
+
+        /* ── FEATURES ────────────────────────────── */
+        .section {
+            position: relative; z-index: 1;
+            padding: 80px 48px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 11px; font-weight: 700; letter-spacing: 2px;
+            color: var(--accent2); text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: clamp(30px, 4vw, 44px);
+            font-weight: 800; letter-spacing: -1px;
+            margin-bottom: 16px;
+        }
+
+        .section-sub { font-size: 16px; color: var(--text2); max-width: 500px; line-height: 1.65; margin-bottom: 56px; }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .feat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .feat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+        .feat-card:hover { border-color: var(--border2); transform: translateY(-4px); box-shadow: 0 12px 36px rgba(0,0,0,0.4); }
+        .feat-card:hover::before { transform: scaleX(1); }
+
+        .feat-icon {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        .feat-card:nth-child(1) .feat-icon { background: rgba(124,106,255,0.15); color: var(--accent2); }
+        .feat-card:nth-child(2) .feat-icon { background: rgba(245,158,11,0.15); color: var(--gold2); }
+        .feat-card:nth-child(3) .feat-icon { background: rgba(16,185,129,0.15); color: var(--emerald2); }
+        .feat-card:nth-child(4) .feat-icon { background: rgba(56,189,248,0.15); color: var(--sky); }
+        .feat-card:nth-child(5) .feat-icon { background: rgba(244,63,94,0.15); color: var(--rose); }
+        .feat-card:nth-child(6) .feat-icon { background: rgba(167,139,250,0.15); color: var(--accent3); }
+
+        .feat-title { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+        .feat-desc { font-size: 14px; color: var(--text2); line-height: 1.65; }
+
+        /* ── HOW IT WORKS ────────────────────────── */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
+            position: relative;
+        }
+        .steps-grid::before {
+            content: '';
+            position: absolute;
+            top: 32px; left: calc(16.6% + 16px); right: calc(16.6% + 16px);
+            height: 1px;
+            background: linear-gradient(90deg, var(--accent), var(--accent2), var(--sky));
+            z-index: 0;
+        }
+
+        .step {
+            padding: 0 24px;
+            text-align: center;
+            position: relative; z-index: 1;
+        }
+
+        .step-num {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            background: var(--surface2);
+            border: 2px solid var(--border2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent2);
+            margin: 0 auto 20px;
+            transition: all 0.3s;
+        }
+        .step:hover .step-num { background: rgba(124,106,255,0.15); border-color: var(--accent); box-shadow: 0 0 20px rgba(124,106,255,0.25); }
+
+        .step-title { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+        .step-desc { font-size: 14px; color: var(--text2); line-height: 1.65; }
+
+        /* ── CTA BANNER ──────────────────────────── */
+        .cta-banner {
+            position: relative; z-index: 1;
+            margin: 0 48px 80px;
+            background: linear-gradient(135deg, #1a1535 0%, #1e1044 50%, #0f1a2e 100%);
+            border: 1px solid rgba(124,106,255,0.2);
+            border-radius: 24px;
+            padding: 64px 48px;
+            text-align: center;
+            overflow: hidden;
+        }
+        .cta-banner::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(124,106,255,0.15), transparent 70%);
+            pointer-events: none;
+        }
+        .cta-banner::after {
+            content: '';
+            position: absolute;
+            bottom: -60px; left: -60px;
+            width: 250px; height: 250px;
+            background: radial-gradient(circle, rgba(56,189,248,0.1), transparent 70%);
+            pointer-events: none;
+        }
+
+        .cta-banner h2 { font-size: 38px; font-weight: 800; letter-spacing: -1px; margin-bottom: 14px; }
+        .cta-banner p { font-size: 16px; color: var(--text2); margin-bottom: 36px; }
+        .cta-actions { display: flex; justify-content: center; align-items: center; gap: 16px; }
+
+        /* ── FOOTER ──────────────────────────────── */
+        footer {
+            position: relative; z-index: 1;
+            border-top: 1px solid var(--border);
+            padding: 28px 48px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 13px; color: var(--text3);
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 1024px) {
+            .features-grid { grid-template-columns: repeat(2, 1fr); }
+            .steps-grid::before { display: none; }
+        }
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .section { padding: 60px 20px; }
+            .features-grid { grid-template-columns: 1fr; }
+            .steps-grid { grid-template-columns: 1fr; gap: 30px; }
+            .stats-inner { grid-template-columns: repeat(2, 1fr); }
+            .cta-banner { margin: 0 20px 60px; padding: 40px 24px; }
+            .cta-banner h2 { font-size: 28px; }
+            footer { flex-direction: column; gap: 12px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- NAV -->
+    <nav>
+        <div class="nav-logo">
+            <div class="nav-logo-icon">📜</div>
+            <span>Sanskrit<em>RAG</em></span>
+        </div>
+        <div class="nav-actions">
+            <a href="/login" class="btn-ghost">Login</a>
+            <a href="/register" class="btn-accent">Get Started →</a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-eyebrow">
+            <i class="fas fa-sparkles"></i>
+            AI-Powered Sanskrit Research
+        </div>
+        <h1>
+            Unlock Ancient<br>
+            <span class="line-accent">Sanskrit Wisdom</span>
+        </h1>
+        <p class="hero-sub">
+            Intelligent document retrieval meets classical scholarship. Search, explore, and discover insights from ancient Sanskrit texts using modern AI.
+        </p>
+        <div class="hero-cta">
+            <a href="/register" class="btn-hero-primary">
+                Start Free <i class="fas fa-arrow-right"></i>
+            </a>
+            <a href="#features" class="btn-hero-ghost">
+                <i class="fas fa-play-circle"></i> See How It Works
+            </a>
+        </div>
+        <div class="sanskrit-deco">ॐ &nbsp;·&nbsp; सर्वे भवन्तु सुखिनः &nbsp;·&nbsp; ॐ</div>
+    </section>
+
+    <!-- STATS STRIP -->
+    <div class="stats-strip">
+        <div class="stats-inner">
+            <div class="stat-cell">
+                <div class="stat-num"><span class="accent">695</span></div>
+                <div class="stat-desc">Vocab Terms</div>
+            </div>
+            <div class="stat-cell">
+                <div class="stat-num"><span class="accent">100%</span></div>
+                <div class="stat-desc">CPU-Based</div>
+            </div>
+            <div class="stat-cell">
+                <div class="stat-num"><span class="accent">24/7</span></div>
+                <div class="stat-desc">Availability</div>
+            </div>
+            <div class="stat-cell">
+                <div class="stat-num"><span class="accent">Local</span></div>
+                <div class="stat-desc">Privacy First</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FEATURES -->
+    <section class="section" id="features">
+        <div class="section-label"><i class="fas fa-bolt"></i> Capabilities</div>
+        <h2 class="section-title">Everything you need<br>for Sanskrit research</h2>
+        <p class="section-sub">A complete toolkit built for scholars, students, and anyone curious about ancient texts.</p>
+
+        <div class="features-grid">
+            <div class="feat-card">
+                <div class="feat-icon"><i class="fas fa-brain"></i></div>
+                <div class="feat-title">AI-Powered RAG Search</div>
+                <div class="feat-desc">Advanced TF-IDF retrieval combined with LLM generation for accurate, context-aware answers from your documents.</div>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon"><i class="fas fa-language"></i></div>
+                <div class="feat-title">Bilingual Support</div>
+                <div class="feat-desc">Query in Sanskrit (Devanāgarī script) or English and receive responses in your preferred language seamlessly.</div>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon"><i class="fas fa-shield-halved"></i></div>
+                <div class="feat-title">Complete Privacy</div>
+                <div class="feat-desc">All processing runs locally. Your queries and documents never leave your system — total data sovereignty.</div>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon"><i class="fas fa-rocket"></i></div>
+                <div class="feat-title">Lightning Fast</div>
+                <div class="feat-desc">Optimized FAISS vector search returns relevant passages in milliseconds, even across large document collections.</div>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon"><i class="fas fa-clock-rotate-left"></i></div>
+                <div class="feat-title">Query History</div>
+                <div class="feat-desc">Every search is saved. Revisit previous answers, reload queries instantly, and build on past research.</div>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="feat-title">Usage Analytics</div>
+                <div class="feat-desc">Track your credit usage, document count, and query volume with a clear real-time dashboard.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="section" id="how">
+        <div class="section-label"><i class="fas fa-map"></i> Process</div>
+        <h2 class="section-title">Three steps to answers</h2>
+        <p class="section-sub">Get from document to insight in under a minute.</p>
+
+        <div class="steps-grid">
+            <div class="step">
+                <div class="step-num">01</div>
+                <div class="step-title">Upload Your Text</div>
+                <div class="step-desc">Drag and drop .txt or .docx Sanskrit documents. Each file is chunked and indexed — and new uploads stack onto the existing knowledge base without overwriting.</div>
+            </div>
+            <div class="step">
+                <div class="step-num">02</div>
+                <div class="step-title">Ask a Question</div>
+                <div class="step-desc">Type your query in Sanskrit or English. The RAG pipeline retrieves the most relevant passages from all uploaded documents.</div>
+            </div>
+            <div class="step">
+                <div class="step-num">03</div>
+                <div class="step-title">Get an Answer</div>
+                <div class="step-desc">Receive a synthesized answer with cited source contexts, relevance scores, and the full retrieved passages for verification.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA BANNER -->
+    <div class="cta-banner">
+        <h2>Start exploring today</h2>
+        <p>Sign up free — get 20 credits instantly and 10 more every day.</p>
+        <div class="cta-actions">
+            <a href="/register" class="btn-hero-primary">Create Free Account <i class="fas fa-arrow-right"></i></a>
+            <a href="/login" class="btn-hero-ghost">Already a member? Login</a>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div>📜 <strong>SanskritRAG</strong> &nbsp;·&nbsp; Built for scholars</div>
+        <div style="font-family:'JetBrains Mono',monospace;">ॐ तत् सत्</div>
+    </footer>
+
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', e => {
+                e.preventDefault();
+                document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
