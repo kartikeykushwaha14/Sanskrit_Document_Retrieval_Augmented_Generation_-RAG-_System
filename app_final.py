@@ -53,7 +53,7 @@ os.makedirs('templates', exist_ok=True)
 # -------------------------
 # Gemini Client
 # -------------------------
-client = genai.Client(api_key="AIzaSyAQxg2pS1QWXVFUJyK8ksUExHBo2ZH-wY4")
+client = genai.Client(api_key="GEMINI_API_KEY")
 
 
 # ============================================
